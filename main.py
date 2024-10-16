@@ -2,10 +2,11 @@
 import pandas as pd 
 from rdkit import Chem
 from dataset import create_pytorch_geometric_graph_list, create_dataloaders
-
+from models import odorGIN
 
 
 if __name__ == '__main__':
+
     df_path = 'data/Multi-Labelled_Smiles_Odors_dataset.csv'
     odor_df = pd.read_csv(df_path)
 
@@ -18,12 +19,36 @@ if __name__ == '__main__':
 
     graph_list = create_pytorch_geometric_graph_list(X, y)
 
-    batch_size, use_shuffle = 32, True
+    batch_size, use_shuffle = 1, True
     train_loader, val_loader, test_loader = create_dataloaders(graph_list, 0.7, 0.2, 0.1, batch_size)
 
-    # for batch in train_loader:
-    #     print(batch)
-    #     break
+    # hyperparamters 
+    hidden_channels = 64
+    num_layers = 2
+    dropout_p = 0
+    pooling_type = 'mean'
+    in_channels = list(graph_list[0].x.shape)[-1]
+    out_channels = 1 
+    num_epochs = 50
+    lr = 1e-4
+    weight_decay = 1e-6
+
+
+    model_GIN = odorGIN.OdorGIN(in_channels, hidden_channels, num_layers)
+
+    for i, batch in enumerate(train_loader):
+
+        X, edge_index, edge_attr, y = batch.x, batch.edge_index, batch.edge_attr, batch.y
+        print(batch, end="\n")
+        y_pred = model_GIN(X, edge_index, edge_attr)
+
+        break
+
+
+
+
+
+    
 
 
 
