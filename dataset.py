@@ -6,7 +6,7 @@ from rdkit import Chem
 from rdkit.Chem.rdmolops import GetAdjacencyMatrix
 import torch
 from torch_geometric.data import Data
-from torch.utils.data import DataLoader
+from torch_geometric.loader import DataLoader
 
 
 def get_atom_features(atom, use_chirality = True,  hydrogens_implicit = True) -> np.array: 
@@ -129,7 +129,7 @@ def create_dataloaders(graph_list: list, train_ratio: float, val_ratio: float, t
     Returns train, val, test dataloaders from the given graph list
     '''
 
-    train_set, val_set, test_set = torch.utils.data.random_split(graph_list, [0.7, 0.1, 0.2])
+    train_set, val_set, test_set = torch.utils.data.random_split(graph_list, [train_ratio, val_ratio, test_ratio])
 
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=use_shuffle, drop_last=True)
     val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=use_shuffle, drop_last=True)
@@ -139,5 +139,10 @@ def create_dataloaders(graph_list: list, train_ratio: float, val_ratio: float, t
 
 
 
+
 if __name__ == '__main__':
     pass
+
+
+
+

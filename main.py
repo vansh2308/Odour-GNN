@@ -1,7 +1,7 @@
 
 import pandas as pd 
 from rdkit import Chem
-from dataset import create_pytorch_geometric_graph_list
+from dataset import create_pytorch_geometric_graph_list, create_dataloaders
 
 
 
@@ -17,4 +17,14 @@ if __name__ == '__main__':
     y = odor_df.iloc[:, 2:].values
 
     graph_list = create_pytorch_geometric_graph_list(X, y)
-    print(graph_list[5])
+
+    batch_size, use_shuffle = 32, True
+    train_loader, val_loader, test_loader = create_dataloaders(graph_list, 0.7, 0.2, 0.1, batch_size)
+
+    # for batch in train_loader:
+    #     print(batch)
+    #     break
+
+
+
+
