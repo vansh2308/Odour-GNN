@@ -1,30 +1,4 @@
-# import matplotlib.pyplot as plt
-# import pandas as pd 
-# from rdkit import Chem
-# from rdkit.Chem import Draw
-# from PIL import Image
 
-
-# df_path = 'data/Multi-Labelled_Smiles_Odors_dataset.csv'
-# odor_df = pd.read_csv(df_path)
-
-
-# # for atom in m.GetAtoms():
-# #     print(atom.get)
-
-# img = Draw.MolToImage(m)
-
-# plt.imshow(img)
-# plt.xticks([])
-# plt.yticks([])
-# plt.show()
-
-# # # im = Image.open(Draw.MolToImage(m))
-# # # im.show()
-
-
-# ============================================================================
-# import packages
 import numpy as np
 from utils import label_encoding
 import pandas as pd 
@@ -80,9 +54,7 @@ def get_bond_features(bond,  use_stereochemistry = True):
     bond_type_enc = label_encoding(bond.GetBondType(), permitted_list_of_bond_types)
     
     bond_is_conj_enc = [int(bond.GetIsConjugated())]
-    
     bond_is_in_ring_enc = [int(bond.IsInRing())]
-    
     bond_feature_vector = bond_type_enc + bond_is_conj_enc + bond_is_in_ring_enc
     
     if use_stereochemistry == True:
@@ -97,12 +69,10 @@ def get_bond_features(bond,  use_stereochemistry = True):
 def create_pytorch_geometric_graph_list(x_smiles, y):
     '''
     Inputs:
-    
     x_smiles = [smiles_1, smiles_2, ....] ... a list of SMILES strings
     y = [y_1, y_2, ...] ... a list of numerial labels for the SMILES strings (such as associated pKi values)
     
     Outputs:
-    
     data_list = [G_1, G_2, ...] ... a list of torch_geometric.data.Data objects which represent labeled molecular graphs that can readily be used for machine learning
     '''
         
@@ -153,22 +123,21 @@ def create_pytorch_geometric_graph_list(x_smiles, y):
     return data_list
 
 
+
+def create_dataloaders(graph_list: list, train_ratio: float, val_ratio: float, test_ratio: float, batch_size: int=64, use_shuffle: bool = True) -> any: 
+    '''
+    Returns train, val, test dataloaders from the given graph list
+    '''
+
+    train_set, val_set, test_set = torch.utils.data.random_split(graph_list, [0.7, 0.1, 0.2])
+
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=use_shuffle, drop_last=True)
+    val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=use_shuffle, drop_last=True)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=use_shuffle, drop_last=True)
+
+    return train_loader, val_loader, test_loader
+
+
+
 if __name__ == '__main__':
     pass
-
-    # df_path = 'data/Multi-Labelled_Smiles_Odors_dataset.csv'
-    # odor_df = pd.read_csv(df_path)
-
-    # m = Chem.MolFromSmiles(odor_df['nonStereoSMILES'][5])
-    # # atom_features = get_atom_features(m.GetAtoms()[0], True, True)
-    # # bond_feature = get_bond_features(m.GetBonds()[0], True)
-
-    # # print(bond_feature)
-
-    # X = odor_df.iloc[:, 0]
-    # classes = odor_df.columns[2:]
-    # y = odor_df.iloc[:, 2:].values
-
-
-    # graph_list = create_pytorch_geometric_graph_list(X, y)
-    # # print(len(graph_list))
