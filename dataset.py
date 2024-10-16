@@ -124,7 +124,7 @@ def create_pytorch_geometric_graph_list(x_smiles, y):
 
 
 
-def create_dataloaders(graph_list: list, train_ratio: float, val_ratio: float, test_ratio: float, batch_size: int=64, use_shuffle: bool = True) -> any: 
+def create_dataloaders(graph_list: list, train_ratio: float, val_ratio: float, test_ratio: float, batch_size: int=1, use_shuffle: bool = True) -> any: 
     '''
     Returns train, val, test dataloaders from the given graph list
     '''

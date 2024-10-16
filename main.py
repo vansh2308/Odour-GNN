@@ -3,7 +3,8 @@ import pandas as pd
 from rdkit import Chem
 from dataset import create_pytorch_geometric_graph_list, create_dataloaders
 from models import odorGIN
-
+from train import train_single_epoch, test, train
+import torch
 
 if __name__ == '__main__':
 
@@ -35,14 +36,23 @@ if __name__ == '__main__':
 
 
     model_GIN = odorGIN.OdorGIN(in_channels, hidden_channels, num_layers)
+    optimizer = torch.optim.Adam(model_GIN.parameters(), lr=lr, weight_decay=weight_decay)
 
-    for i, batch in enumerate(train_loader):
+    # train_single_epoch(model_GIN, optimizer, train_loader, mode='train')
+    
+    # precision, all_preds, all_trgts =  test(model_GIN, test_loader)
+    train(model_GIN, num_epochs, lr, weight_decay, train_loader, val_loader)
 
-        X, edge_index, edge_attr, y = batch.x, batch.edge_index, batch.edge_attr, batch.y
-        print(batch, end="\n")
-        y_pred = model_GIN(X, edge_index, edge_attr)
 
-        break
+
+
+    # for i, batch in enumerate(train_loader):
+
+    #     X, edge_index, edge_attr, y = batch.x, batch.edge_index, batch.edge_attr, batch.y
+    #     print(batch, end="\n")
+    #     y_pred = model_GIN(X, edge_index, edge_attr)
+
+    #     break
 
 
 
