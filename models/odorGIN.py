@@ -42,7 +42,7 @@ class OdorGIN(torch.nn.Module):
         self.gnn.reset_parameters()
         self.classifier.reset_parameters()
 
-    def forward(self, x, edge_index, edge_attr, batch=torch.tensor([0])):
+    def forward(self, x, edge_index, edge_attr=None, batch=torch.tensor([0])):
         h = self.gnn(x, edge_index, edge_attr=edge_attr)
         return self.classifier(h, batch)
 

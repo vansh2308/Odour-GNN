@@ -1,4 +1,4 @@
-
+import torch_geometric.utils as pyg_utils
 import numpy as np
 from utils import label_encoding
 import pandas as pd 
@@ -77,6 +77,7 @@ def create_pytorch_geometric_graph_list(x_smiles, y):
     '''
         
     data_list = []
+    # data_list = [pyg_utils.smiles.from_smiles(x_smiles[i]) for i in range(len(x_smiles))]
     
     for (smiles, y_val) in zip(x_smiles, y):
         
@@ -118,7 +119,7 @@ def create_pytorch_geometric_graph_list(x_smiles, y):
         y_tensor = torch.tensor(y_val, dtype = torch.float)
         
         # construct Pytorch Geometric data object and append to data list
-        data_list.append(Data(x = X, edge_index = E, edge_attr = EF, y = y_tensor))
+        data_list.append(Data(x = X, edge_index = E, edge_attr = EF, y = y_tensor, smiles=smiles))
 
     return data_list
 
@@ -135,7 +136,7 @@ def create_dataloaders(graph_list: list, train_ratio: float, val_ratio: float, t
     val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=use_shuffle, drop_last=True)
     test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=use_shuffle, drop_last=True)
 
-    return train_loader, val_loader, test_loader
+    return train_set, val_set, test_set,  train_loader, val_loader, test_loader
 
 
 

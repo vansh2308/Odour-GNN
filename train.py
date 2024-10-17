@@ -4,6 +4,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt 
 from utils import plot_losses
 from sklearn.metrics import f1_score, roc_auc_score
+# from torch_geometric.nn import save_pretrained
 
 
 softmax_cutoff = 0.005
@@ -22,7 +23,7 @@ def train_single_epoch(model, optimizer, train_loader, mode):
     for data in train_loader:
         # data = data.to(device)
         optimizer.zero_grad()
-        out = model(data.x, data.edge_index, data.batch)
+        out = model(data.x, data.edge_index, data.edge_attr)
         loss = torch.nn.CrossEntropyLoss()(out.squeeze(), data.y)
 
         if mode == "train":
@@ -93,6 +94,8 @@ def train(model, num_epochs, lr, weight_decay, train_loader, val_loader):
         accs.append(test_acc)
         losses.append(loss)
         val_losses.append(val_loss)
+        if( val_losses == [] or  val_loss < min(val_losses)):
+            model.save_pretrained('./models/odorGIN.pth', push_to_hub=False)
 
     best_f1_score = max(f1_scores)
     best_f1_epoch = f1_scores.index(best_f1_score)
