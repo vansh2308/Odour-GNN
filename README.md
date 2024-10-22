@@ -18,7 +18,7 @@
 ##### Hyperparameter Tuning 
 <div align="center">
 <img src="./figures/plots/lr_acc_dropout.png" width="45%"> &nbsp;
-<img src="/figures/plots/imp.png" width="50%">
+<img src="/figures/plots/hyp_corr.png" width="50%">
 <img src="/figures/plots/hyt.png" width="90%">
 </div>
 
