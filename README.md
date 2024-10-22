@@ -14,6 +14,20 @@
 - Hyperarameter tuning 
 - Embedding Space visualisation
 
+### Results 
+##### Hyperparameter Tuning 
+<div align="center">
+<img src="./figures/plots/lr_acc_dropout.png" width="45%"> &nbsp;
+<img src="/figures/plots/imp.png" width="50%">
+<img src="/figures/plots/hyt.png" width="90%">
+</div>
+
+##### Finetuning 
+<div align="center">
+<img src="./figures/plots/acc.png" width="48%"> &nbsp;
+<img src="/figures/plots/valloss.png" width="48%">
+</div>
+
 
 ### Setup Instructions
 __Requirements__
