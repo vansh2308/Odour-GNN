@@ -16,11 +16,7 @@
 
 ### Results 
 ##### Hyperparameter Tuning 
-<div align="center">
-<img src="./figures/plots/lr_acc_dropout.png" width="45%"> &nbsp;
-<img src="/figures/plots/hyp_corr.png" width="50%">
-<img src="/figures/plots/hyt.png" width="90%">
-</div>
+<img src="/figures/plots/hyt_fig.png" width="100%">
 
 ##### Finetuning 
 <div align="center">
