@@ -103,7 +103,7 @@ if __name__ == '__main__':
     )
 
     # random visualizations
-    idx = random.sample(range(len(test_set)), 5)
+    idx = random.sample(range(len(test_set)), 25)
     for i in idx:
       visualize_molecule_explanation(test_set, i, ob_explainer)
 

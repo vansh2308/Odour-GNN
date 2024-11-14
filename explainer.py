@@ -13,16 +13,6 @@ from matplotlib import colors
 
 
 
-
-# get explanations for all of test set
-# all_ob_explanations = []
-# for graph_idx in range(len(test_set)):
-#   data = test_set[graph_idx]
-#   x, edge_index = data.x, data.edge_index
-#   ob_explanation = ob_explainer(x, edge_index, batch=torch.tensor([0]))
-#   all_ob_explanations.append(ob_explanation)
-
-
 def atom_col(atom_imp):
   col = {}
   threshold = torch.mean(atom_imp)
@@ -42,7 +32,7 @@ def bond_col(mol, bond_imp, edge_id, threshold=0.5):
       i, j = min(i, j), max(i, j)
       imp = bond_imp[edge_id.index((i, j))]
       if imp > threshold:
-        col[i] = colors.to_rgb("#F06060")
+        col[i] = colors.to_rgb("#1BBC9B")
       else:
         col[i] = colors.to_rgb('#D3D3D3')
   return col
