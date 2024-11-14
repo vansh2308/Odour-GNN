@@ -12,7 +12,6 @@ from matplotlib import colors
 # from IPython.display import SVG
 
 
-
 def atom_col(atom_imp):
   col = {}
   threshold = torch.mean(atom_imp)
@@ -22,7 +21,8 @@ def atom_col(atom_imp):
     else:
       col[i] = colors.to_rgb('#D3D3D3')
   return col
-    
+
+
 # Assign colors to edges with higher than average scores
 def bond_col(mol, bond_imp, edge_id, threshold=0.5):
   col = {}
