@@ -1,18 +1,17 @@
-
+import numpy as np 
 import pandas as pd 
 import random
 import matplotlib.pyplot as plt
 from rdkit import Chem
 from dataset import create_pytorch_geometric_graph_list, create_dataloaders
 from models import odorGIN
-from train import train_single_epoch, test, train
+from train import train_single_epoch, test, train_model
 import torch
 from rdkit.Chem import Draw
 from torch_geometric.explain import Explanation, Explainer, ModelConfig
 from torch_geometric import explain
 from explainer import visualize_molecule_explanation
 
-# WIP: embedding space.
 
 if __name__ == '__main__':
 
@@ -58,10 +57,37 @@ if __name__ == '__main__':
 
     model_GIN = odorGIN.OdorGIN(in_channels, hidden_channels, num_layers)
     optimizer = torch.optim.Adam(model_GIN.parameters(), lr=lr, weight_decay=weight_decay)
+    mode = 'pretrained'
 
+    if mode == 'train':
+       train_model(model_GIN, num_epochs, lr, weight_decay, train_loader, val_loader, batch_size)
+    else:
+       model_GIN.load_state_dict(torch.load("wandb/run-20241022_115722-1tq4w6oy/files/gin-best-model.pth", weights_only=True))
 
-    # WIP: Hyperparameter tuning
-    # train(model_GIN, num_epochs, lr, weight_decay, train_loader, val_loader)
+    # print(model_GIN.state_dict())
+
+    test_mode = False
+    if test_mode:
+        classes = odor_df.columns[2:].to_numpy()
+        softmax_cutoff = 0.001
+
+        for data in test_loader:
+            model_GIN.eval()
+            out = model_GIN(data.x, data.edge_index, data.edge_attr)
+            out = (out.squeeze() >= softmax_cutoff).float()
+
+            total_correct = int((out == data.y).sum())
+            print('Accuracy: {}'.format(round( total_correct/out.shape[0] ,3)))
+
+            labels = classes[data.y.squeeze().nonzero()]
+            preds = classes[out.nonzero()]
+            if isinstance(labels, np.ndarray):
+                labels = labels.flatten()
+            if isinstance(preds, np.ndarray):
+                preds = preds.flatten()
+
+            print("Ground Truth: {}".format(labels))
+            print("Predictions: {}".format(preds))
 
 
     # Explainer for edge structure

@@ -2,10 +2,14 @@ import torch
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt 
+import os 
+import wandb
 from utils import plot_losses
 from sklearn.metrics import f1_score, roc_auc_score
 # from torch_geometric.nn import save_pretrained
 
+
+# WIP: Hyperparameter tuning, save best model, 
 
 softmax_cutoff = 0.005
 
@@ -64,56 +68,45 @@ def test(model, loader):
 
 
 
-
-def train(model, num_epochs, lr, weight_decay, train_loader, val_loader):
+def train_model(model, num_epochs, lr, weight_decay, train_loader, val_loader, batch_size):
     '''
     Train or finetune the given model using the train/val sets
     '''
 
+    run = wandb.init(project="OdorGNN")
+    wandb.config = {"epochs": 5, "learning_rate": lr, "batch_size": batch_size}
+
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    # track metrics
-    roc_scores, f1_scores, accs, losses, val_losses = [], [], [], [], []
+    train_accs, test_accs, train_losses, val_losses = [], [], [], []
 
     for epoch in tqdm(range(num_epochs)):
-        loss = train_single_epoch(model, optimizer, train_loader, 'train')
+        train_loss = train_single_epoch(model, optimizer, train_loader, 'train')
         val_loss = train_single_epoch(model, optimizer, val_loader, 'val')
         train_acc, train_preds, train_true  = test(model, train_loader)
         test_acc, test_preds, test_true = test(model, val_loader)
 
-        # calculate bootstrapped ROC AUC score over entire val set
-        _, whole_val_preds, whole_val_true = test(model, val_loader)
-        whole_val_preds = whole_val_preds.squeeze()
-        whole_val_true = whole_val_true.squeeze()
-        rocauc_score = roc_auc_score(whole_val_true.cpu(), whole_val_preds.cpu())
-        f1 = f1_score(whole_val_true.cpu(), whole_val_preds.cpu(), average='weighted')
-
+        wandb.log({"Train Accuracy": train_acc, "Train Loss": train_loss, "Val Accuracy": test_acc, "Val Loss": val_loss})
+        
         # track metrics
-        roc_scores.append(rocauc_score)
-        f1_scores.append(f1)
-        accs.append(test_acc)
-        losses.append(loss)
+        train_accs.append(train_acc)
+        test_accs.append(test_acc)
+        train_losses.append(train_loss)
         val_losses.append(val_loss)
-        if( val_losses == [] or  val_loss < min(val_losses)):
-            model.save_pretrained('./models/odorGIN.pth', push_to_hub=False)
 
-    best_f1_score = max(f1_scores)
-    best_f1_epoch = f1_scores.index(best_f1_score)
-    best_auc_score = max(roc_scores)
-    best_auc_epoch = roc_scores.index(best_auc_score)
+    # torch.save(model.state_dict(), 'gin-best-model.pth')
 
-    plot_losses(losses, val_losses, title='finetuning: train vs. val loss')
-    fig, ax = plt.subplots(1, 2, figsize=(6, 2))
-    for i, (name, metric) in enumerate([
-        ('f1', f1_scores), ('roc', roc_scores)
-    ]):
-        ax[i].plot(range(len(metric)), metric)
-        ax[i].set_ylim((0, 1))
-        ax[i].set_title(name)
-    plt.show()
-    
-    return best_f1_score, best_f1_epoch, best_auc_score, best_auc_epoch
+    torch.save(model.state_dict(),  os.path.join(wandb.run.dir, "gin-best-model.pth"))
+    # wandb.save('model.h5')
+    # wandb.save('../logs/*ckpt*')
+    # wandb.save(os.path.join(wandb.run.dir, "checkpoint*"))
 
+    artifact = wandb.Artifact('gin-best-model', type='model')
+    # artifact.add_file('gin-best-model.pth')
+    # run.log_artifact(artifact)
+
+    run.finish()
+    return train_losses, val_losses, train_accs, test_accs
 
 
 

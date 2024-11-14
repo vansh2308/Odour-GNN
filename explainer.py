@@ -3,7 +3,7 @@ import random
 from rdkit import Chem
 import torch
 from torch_geometric import explain
-from torch_geometric.explain import Explanation, Explainer, ModelConfig
+# from torch_geometric.explain import Explanation, Explainer, ModelConfig
 from pickle import NONE
 from rdkit.Chem.Draw import rdMolDraw2D
 from rdkit.Chem import rdDepictor
