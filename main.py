@@ -9,9 +9,10 @@ from models import odorGIN
 from train import train_single_epoch, test, train_model
 import torch
 from rdkit.Chem import Draw
-from torch_geometric.explain import Explanation, Explainer, ModelConfig
+from torch_geometric.explain import ModelConfig
+from explainer import Explainer
 from torch_geometric import explain
-from explainer import visualize_molecule_explanation
+from explaination_visualiser import visualize_molecule_explanation
 import argparse
 
 # WIP: add terminal args
@@ -25,7 +26,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    df_path = args.path if args.path else 'data/Multi-Labelled_Smiles_Odors_dataset.csv'
+    df_path = args.path if args.data_path else 'data/Multi-Labelled_Smiles_Odors_dataset.csv'
     odor_df = pd.read_csv(df_path)
 
     X = odor_df.iloc[:, 0]
@@ -108,11 +109,8 @@ if __name__ == '__main__':
     if(args.explain):
         ob_explainer = Explainer(
             model_GIN, 
-            algorithm=explain.algorithm.GNNExplainer(),
             explanation_type="model", 
-            model_config=ModelConfig(mode="binary_classification", task_level="graph", return_type="probs"),
-            node_mask_type="object",
-            edge_mask_type="object"
+            model_config=ModelConfig(mode="multiclass_classification", task_level="graph", return_type="probs"),
         )
 
         # random visualizations
